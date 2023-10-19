@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
-const { ObjectId } = require('mongodb');
+const { ObjectId } = require("mongodb");
 
 const port = process.env.PORT || 3000;
 
@@ -25,13 +25,13 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    //must clone this line. or vercel will not work
+    //must close this line. or vercel will not work
     // await client.connect();
 
     const products = client.db("Assignment-10").collection("products");
     const users = client.db("Assignment-10").collection("users");
 
-    //                              users
+    //                              products
     //Create
     app.post("/brands", async (req, res) => {
       const product = req.body;
@@ -61,13 +61,13 @@ async function run() {
       const options = { upsert: true };
       const updatedData = {
         $set: {
-            name: data.name,
-            type: data.type,
-            image: data.image,
-            price: data.price,
-            description: data.description,
-            rating: data.rating,
-            brand: data.brand
+          name: data.name,
+          type: data.type,
+          image: data.image,
+          price: data.price,
+          description: data.description,
+          rating: data.rating,
+          brand: data.brand,
         },
       };
       const result = await products.updateOne(filter, updatedData, options);
@@ -75,13 +75,29 @@ async function run() {
     });
 
     //Delete
-    app.delete("/brands/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await products.deleteOne(query);
+    // app.delete("/brands/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: new ObjectId(id) };
+    //   const result = await products.deleteOne(query);
+    //   res.send(result);
+    // });
+    //                                       /products
+
+    //                          users
+    //Create users
+    app.post("/cart", async (req, res) => {
+      const userInfo = req.body;
+      const result = await users.insertOne(userInfo);
       res.send(result);
     });
-    //                                       users
+
+    //Read            //get users data
+    app.get("/cart/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await users.find(query).toArray();
+      res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log(
