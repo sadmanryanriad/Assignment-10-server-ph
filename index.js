@@ -61,8 +61,13 @@ async function run() {
       const options = { upsert: true };
       const updatedData = {
         $set: {
-          name: data.name,
-          email: data.email,
+            name: data.name,
+            type: data.type,
+            image: data.image,
+            price: data.price,
+            description: data.description,
+            rating: data.rating,
+            brand: data.brand
         },
       };
       const result = await products.updateOne(filter, updatedData, options);
